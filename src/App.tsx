@@ -14,8 +14,7 @@ import {
   Github,
   Linkedin,
   X,
-  Eye,
-  EyeOff
+  Eye
 } from 'lucide-react';
 import { cn } from './lib/utils';
 import { Robot } from './components/Robot';
@@ -320,12 +319,6 @@ function ReadmeSkeleton() {
 
 export default function App() {
   const [loading, setLoading] = useState(true);
-  const [highContrast, setHighContrast] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('highContrast') === 'true';
-    }
-    return false;
-  });
   const [activeSection, setActiveSection] = useState('inicio');
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -483,10 +476,6 @@ export default function App() {
   }, [activeSection]);
 
   useEffect(() => {
-    localStorage.setItem('highContrast', String(highContrast));
-  }, [highContrast]);
-
-  useEffect(() => {
     setActiveTab('about');
     setReadmeContent('');
     setReadmeStatus('idle');
@@ -499,7 +488,7 @@ export default function App() {
   }, [readmeContent, readmeStatus]);
 
   return (
-    <div className={cn(highContrast && "high-contrast")}>
+    <div>
       <AnimatePresence mode="wait">
         {loading && <Preloader key="preloader" />}
       </AnimatePresence>
@@ -595,15 +584,6 @@ export default function App() {
             >
               Contato
             </a>
-
-            <button
-              onClick={() => setHighContrast(!highContrast)}
-              className="p-1.5 rounded-md hover:bg-white/10 transition-colors border border-transparent hover:border-white/20"
-              title={highContrast ? "Desativar Alto Contraste" : "Ativar Alto Contraste"}
-              aria-label={highContrast ? "Desativar Alto Contraste" : "Ativar Alto Contraste"}
-            >
-              {highContrast ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
           </div>
         </nav>
 
