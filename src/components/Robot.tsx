@@ -14,13 +14,17 @@ const TIPS = [
   "Dê um clique em mim para mais dicas de dev!"
 ];
 
-export function Robot() {
+export function Robot({ visitorCount }: { visitorCount: number | null }) {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [showTip, setShowTip] = useState(false);
   const [currentTip, setCurrentTip] = useState("");
   const [isSleeping, setIsSleeping] = useState(false);
   const robotRef = useRef<HTMLDivElement>(null);
   const sleepTimeoutRef = useRef<number | null>(null);
+
+  const dynamicTips = visitorCount !== null
+    ? [...TIPS, `Este portfólio já recebeu mais de ${visitorCount} visitas! Obrigado por vir! 🚀`]
+    : TIPS;
 
   const wakeUp = () => {
     if (isSleeping) setIsSleeping(false);
@@ -69,7 +73,7 @@ export function Robot() {
 
   const handleClick = () => {
     wakeUp();
-    const randomTip = TIPS[Math.floor(Math.random() * TIPS.length)];
+    const randomTip = dynamicTips[Math.floor(Math.random() * dynamicTips.length)];
     triggerMessage(randomTip);
   };
 

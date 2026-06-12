@@ -86,6 +86,7 @@ const INITIAL_PROJECTS: Project[] = [
     id: 'tarefasia',
     name: 'Tarefasia',
     url: 'tarefasia.vercel.app',
+    githubUrl: 'https://github.com/Murillooh/Tarefas-IA',
     tags: ['React', 'Gemini AI', 'Tailwind CSS', 'Firebase'],
     description: 'Gerenciador de tarefas inteligente com inteligência artificial integrada (Gemini AI). Conta com produtividade semanal ágil, assistente para detalhamento de tarefas em tempo real, relatórios executivos em PDF e autenticação segura com Google.',
     previewUrl: '/tarefasia_preview.png'
@@ -522,7 +523,7 @@ export default function App() {
               delay: 0.5
             }}
           >
-            <Robot />
+            <Robot visitorCount={visitorCount} />
           </motion.div>
         </div>
 
@@ -708,6 +709,21 @@ export default function App() {
                   <History size={12} /> 5+ anos de experiência
                 </span>
               </Badge>
+              {visitorCount !== null && (
+                <Badge variant="purple">
+                  <span
+                    className="flex items-center gap-2"
+                    onMouseEnter={() => say(`Nossa comunidade está crescendo! Já são mais de ${visitorCount} visitas registradas.`)}
+                  >
+                    <span className="flex h-1.5 w-1.5 relative">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-teal opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-accent-teal"></span>
+                    </span>
+                    <Eye size={12} className="text-accent-purple" />
+                    <span>Visitas: <strong className="text-white font-bold">{visitorCount}</strong></span>
+                  </span>
+                </Badge>
+              )}
             </motion.div>
           </motion.div>
         </section>
@@ -1097,9 +1113,13 @@ export default function App() {
                 </Tooltip>
               </motion.div>
               {visitorCount !== null && (
-                <div className="mt-6 flex items-center gap-1.5 text-gray-500 font-mono text-[10px] sm:text-[11px] uppercase tracking-wider justify-end">
-                  <Eye size={12} className="text-accent-purple" />
-                  <span>Visitas: <span className="text-white font-bold">{visitorCount}</span></span>
+                <div className="mt-6 flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 text-gray-400 font-mono text-[10px] sm:text-[11px] uppercase tracking-wider justify-end shadow-lg shadow-black/40 backdrop-blur-md hover:border-accent-purple/50 transition-all hover:scale-105 duration-300 group/visits select-none">
+                  <span className="flex h-1.5 w-1.5 relative">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-teal opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-accent-teal"></span>
+                  </span>
+                  <Eye size={12} className="text-accent-purple group-hover/visits:text-accent-teal transition-colors" />
+                  <span>Visitas: <span className="text-white font-bold tracking-normal">{visitorCount}</span></span>
                 </div>
               )}
               <div className="mt-4 text-[10px] sm:text-[11px] font-mono text-gray-500 uppercase tracking-widest">
