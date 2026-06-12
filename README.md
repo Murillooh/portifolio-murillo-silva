@@ -141,6 +141,8 @@ O portfólio apresenta detalhadamente os seguintes sistemas desenvolvidos:
 
 ## ✉️ Contato
 
+- **Nome:** Murillo Silva
+- **Telefone / WhatsApp:** [+55 (11) 95136-6825](https://wa.me/5511951366825)
 - **LinkedIn:** [linkedin.com/in/murillo-silva-dev](https://www.linkedin.com/in/murillo-silva-dev/)
 - **GitHub:** [github.com/Murillooh](https://github.com/Murillooh)
 - **Localização:** São Paulo - SP, Brasil
