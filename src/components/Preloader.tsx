@@ -40,7 +40,7 @@ export function Preloader() {
             transition={{ delay: 0.2, duration: 0.6, ease: "circOut" }}
             className="text-white text-2xl md:text-3xl font-display font-medium tracking-tight mb-2"
           >
-            Murilo Silva
+            ꪑꪊ𝘳𝓲ꪶꪶꪮ 𝘴𝓲ꪶꪜꪖ
           </motion.h1>
           <motion.div
             initial={{ width: 0, opacity: 0 }}
