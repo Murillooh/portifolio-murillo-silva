@@ -69,9 +69,10 @@ ${formData.message}`;
 
   return (
     <div className="w-full max-w-2xl mx-auto">
-      <div className="bg-card-bg border border-card-border rounded-3xl p-8 md:p-12 relative overflow-hidden group shadow-xl">
-        {/* Subtle background glow */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-accent-purple/5 blur-[60px] rounded-full pointer-events-none group-hover:bg-accent-purple/10 transition-colors duration-700" />
+      <div className="bg-card-bg border border-card-border/80 rounded-3xl p-8 md:p-12 relative overflow-hidden group shadow-2xl hover:border-accent-purple/35 transition-all duration-500">
+        {/* Subtle background glows */}
+        <div className="absolute top-0 right-0 w-48 h-48 bg-accent-purple/10 blur-[80px] rounded-full pointer-events-none group-hover:bg-accent-purple/20 transition-all duration-700" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-accent-teal/5 blur-[80px] rounded-full pointer-events-none group-hover:bg-accent-teal/10 transition-all duration-700" />
         
         <AnimatePresence mode="wait">
           {status === 'success' ? (
@@ -97,7 +98,7 @@ ${formData.message}`;
               </p>
               <button 
                 onClick={() => setStatus('idle')}
-                className="mt-10 px-8 py-3 rounded-full border border-accent-purple/30 text-accent-purple hover:bg-accent-purple/10 transition-all font-mono text-[10px] uppercase tracking-widest"
+                className="mt-10 px-8 py-3 rounded-full border border-accent-purple/30 text-accent-purple hover:bg-accent-purple/10 transition-all font-mono text-[10px] uppercase tracking-widest cursor-pointer"
               >
                 Enviar outra mensagem
               </button>
@@ -125,10 +126,10 @@ ${formData.message}`;
                       value={formData.name}
                       onChange={handleChange}
                       className={cn(
-                        "w-full bg-black/40 border rounded-2xl py-4 pl-12 pr-4 text-sm focus:outline-none transition-all duration-300",
+                        "w-full bg-white/[0.02] backdrop-blur-md border rounded-2xl py-4 pl-12 pr-4 text-sm focus:outline-none transition-all duration-300",
                         errors.name 
                           ? "border-red-500/50 focus:border-red-500 ring-2 ring-red-500/10" 
-                          : "border-white/10 focus:border-accent-purple focus:ring-4 focus:ring-accent-purple/10 focus:bg-black/70"
+                          : "border-white/10 hover:border-white/20 focus:border-accent-purple focus:ring-4 focus:ring-accent-purple/10 focus:bg-white/[0.04]"
                       )}
                     />
                     <label 
@@ -159,10 +160,10 @@ ${formData.message}`;
                       value={formData.email}
                       onChange={handleChange}
                       className={cn(
-                        "w-full bg-black/40 border rounded-2xl py-4 pl-12 pr-4 text-sm focus:outline-none transition-all duration-300",
+                        "w-full bg-white/[0.02] backdrop-blur-md border rounded-2xl py-4 pl-12 pr-4 text-sm focus:outline-none transition-all duration-300",
                         errors.email 
                           ? "border-red-500/50 focus:border-red-500 ring-2 ring-red-500/10" 
-                          : "border-white/10 focus:border-accent-purple focus:ring-4 focus:ring-accent-purple/10 focus:bg-black/70"
+                          : "border-white/10 hover:border-white/20 focus:border-accent-purple focus:ring-4 focus:ring-accent-purple/10 focus:bg-white/[0.04]"
                       )}
                     />
                     <label 
@@ -194,10 +195,10 @@ ${formData.message}`;
                     value={formData.message}
                     onChange={handleChange}
                     className={cn(
-                      "w-full bg-black/40 border rounded-2xl pt-4 pb-4 pl-12 pr-4 text-sm focus:outline-none transition-all duration-300 resize-none",
+                      "w-full bg-white/[0.02] backdrop-blur-md border rounded-2xl pt-4 pb-4 pl-12 pr-4 text-sm focus:outline-none transition-all duration-300 resize-none",
                       errors.message 
                         ? "border-red-500/50 focus:border-red-500 ring-2 ring-red-500/10" 
-                        : "border-white/10 focus:border-accent-purple focus:ring-4 focus:ring-accent-purple/10 focus:bg-black/70"
+                        : "border-white/10 hover:border-white/20 focus:border-accent-purple focus:ring-4 focus:ring-accent-purple/10 focus:bg-white/[0.04]"
                     )}
                   />
                   <label 
@@ -220,10 +221,10 @@ ${formData.message}`;
                 type="submit"
                 disabled={status === 'submitting'}
                 className={cn(
-                  "w-full py-4.5 rounded-2xl flex items-center justify-center gap-3 transition-all duration-300 font-bold text-[13px] uppercase tracking-wider overflow-hidden relative group shadow-xl",
+                  "w-full py-4.5 rounded-2xl flex items-center justify-center gap-3 transition-all duration-500 font-bold text-[13px] uppercase tracking-widest overflow-hidden relative group/btn shadow-xl active:scale-[0.98] cursor-pointer",
                   status === 'submitting' 
                     ? "bg-gray-800 text-gray-400 cursor-not-allowed" 
-                    : "bg-white text-black hover:bg-accent-purple hover:text-white"
+                    : "bg-white text-black hover:bg-gradient-to-r hover:from-[#25D366] hover:to-[#128C7E] hover:text-white"
                 )}
               >
                 <span className="relative z-10 flex items-center gap-2.5">
@@ -240,7 +241,8 @@ ${formData.message}`;
                     <>
                       Enviar via WhatsApp
                       <motion.div
-                        animate={{ x: [0, 5, 0] }}
+                        className="group-hover/btn:translate-x-1 group-hover/btn:-translate-y-0.5 transition-transform duration-300"
+                        animate={{ x: [0, 3, 0] }}
                         transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
                       >
                         <Send size={18} />
@@ -251,10 +253,10 @@ ${formData.message}`;
                 
                 {/* Button shine effect */}
                 <motion.div 
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-[-20deg]"
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent skew-x-[-20deg]"
                   initial={{ left: '-100%' }}
                   whileHover={{ left: '100%' }}
-                  transition={{ duration: 0.6, ease: "easeInOut" }}
+                  transition={{ duration: 0.8, ease: "easeInOut" }}
                 />
               </button>
             </motion.form>
