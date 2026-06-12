@@ -68,8 +68,11 @@ ${formData.message}`;
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto">
-      <div className="bg-card-bg border border-card-border/80 rounded-3xl p-8 md:p-12 relative overflow-hidden group shadow-2xl hover:border-accent-purple/35 transition-all duration-500">
+    <div className="w-full max-w-2xl mx-auto relative rounded-3xl p-[2px] overflow-hidden bg-white/5 shadow-2xl hover:shadow-[0_0_35px_rgba(6,182,212,0.25)] transition-all duration-500">
+      {/* Rotating Neon Border Effect (Light Blue/Cyan) */}
+      <div className="absolute inset-[-50%] bg-[conic-gradient(from_0deg,transparent_45%,#00d2ff_50%,transparent_55%)] animate-border-rotate pointer-events-none z-0" />
+      
+      <div className="bg-card-bg rounded-[22px] p-8 md:p-12 relative z-10 w-full h-full overflow-hidden group">
         {/* Subtle background glows */}
         <div className="absolute top-0 right-0 w-48 h-48 bg-accent-purple/10 blur-[80px] rounded-full pointer-events-none group-hover:bg-accent-purple/20 transition-all duration-700" />
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-accent-teal/5 blur-[80px] rounded-full pointer-events-none group-hover:bg-accent-teal/10 transition-all duration-700" />
@@ -126,19 +129,19 @@ ${formData.message}`;
                       value={formData.name}
                       onChange={handleChange}
                       className={cn(
-                        "w-full bg-white/[0.02] backdrop-blur-md border rounded-2xl py-4 pl-12 pr-4 text-sm focus:outline-none transition-all duration-300",
+                        "w-full bg-[#050505] border text-white rounded-2xl py-4 pl-12 pr-4 text-sm focus:outline-none transition-all duration-300",
                         errors.name 
                           ? "border-red-500/50 focus:border-red-500 ring-2 ring-red-500/10" 
-                          : "border-white/10 hover:border-white/20 focus:border-accent-purple focus:ring-4 focus:ring-accent-purple/10 focus:bg-white/[0.04]"
+                          : "border-white/10 hover:border-white/20 focus:border-accent-purple focus:ring-4 focus:ring-accent-purple/10 focus:bg-[#080808]"
                       )}
                     />
                     <label 
                       htmlFor="name" 
                       className={cn(
-                        "absolute left-12 top-1/2 -translate-y-1/2 text-[10px] uppercase tracking-widest font-mono text-gray-500 transition-all duration-300 pointer-events-none px-1",
+                        "absolute left-12 top-1/2 -translate-y-1/2 text-xs sm:text-sm uppercase tracking-widest font-mono text-gray-400 transition-all duration-300 pointer-events-none px-1",
                         formData.name 
-                          ? "-top-2 left-4 text-accent-purple bg-card-bg scale-90" 
-                          : "group-focus-within/input:-top-2 group-focus-within/input:left-4 group-focus-within/input:text-accent-purple group-focus-within/input:bg-card-bg group-focus-within/input:scale-90"
+                          ? "-top-2 left-4 scale-90 text-[10px] text-accent-purple bg-card-bg px-1.5" 
+                          : "group-focus-within/input:-top-2 group-focus-within/input:left-4 group-focus-within/input:scale-90 group-focus-within/input:text-[10px] group-focus-within/input:text-accent-purple group-focus-within/input:bg-card-bg group-focus-within/input:px-1.5"
                       )}
                     >
                       Nome Completo
@@ -160,19 +163,19 @@ ${formData.message}`;
                       value={formData.email}
                       onChange={handleChange}
                       className={cn(
-                        "w-full bg-white/[0.02] backdrop-blur-md border rounded-2xl py-4 pl-12 pr-4 text-sm focus:outline-none transition-all duration-300",
+                        "w-full bg-[#050505] border text-white rounded-2xl py-4 pl-12 pr-4 text-sm focus:outline-none transition-all duration-300",
                         errors.email 
                           ? "border-red-500/50 focus:border-red-500 ring-2 ring-red-500/10" 
-                          : "border-white/10 hover:border-white/20 focus:border-accent-purple focus:ring-4 focus:ring-accent-purple/10 focus:bg-white/[0.04]"
+                          : "border-white/10 hover:border-white/20 focus:border-accent-purple focus:ring-4 focus:ring-accent-purple/10 focus:bg-[#080808]"
                       )}
                     />
                     <label 
                       htmlFor="email" 
                       className={cn(
-                        "absolute left-12 top-1/2 -translate-y-1/2 text-[10px] uppercase tracking-widest font-mono text-gray-500 transition-all duration-300 pointer-events-none px-1",
+                        "absolute left-12 top-1/2 -translate-y-1/2 text-xs sm:text-sm uppercase tracking-widest font-mono text-gray-400 transition-all duration-300 pointer-events-none px-1",
                         formData.email 
-                          ? "-top-2 left-4 text-accent-purple bg-card-bg scale-90" 
-                          : "group-focus-within/input:-top-2 group-focus-within/input:left-4 group-focus-within/input:text-accent-purple group-focus-within/input:bg-card-bg group-focus-within/input:scale-90"
+                          ? "-top-2 left-4 scale-90 text-[10px] text-accent-purple bg-card-bg px-1.5" 
+                          : "group-focus-within/input:-top-2 group-focus-within/input:left-4 group-focus-within/input:scale-90 group-focus-within/input:text-[10px] group-focus-within/input:text-accent-purple group-focus-within/input:bg-card-bg group-focus-within/input:px-1.5"
                       )}
                     >
                       E-mail
@@ -195,19 +198,19 @@ ${formData.message}`;
                     value={formData.message}
                     onChange={handleChange}
                     className={cn(
-                      "w-full bg-white/[0.02] backdrop-blur-md border rounded-2xl pt-4 pb-4 pl-12 pr-4 text-sm focus:outline-none transition-all duration-300 resize-none",
+                      "w-full bg-[#050505] border text-white rounded-2xl pt-4 pb-4 pl-12 pr-4 text-sm focus:outline-none transition-all duration-300 resize-none",
                       errors.message 
                         ? "border-red-500/50 focus:border-red-500 ring-2 ring-red-500/10" 
-                        : "border-white/10 hover:border-white/20 focus:border-accent-purple focus:ring-4 focus:ring-accent-purple/10 focus:bg-white/[0.04]"
+                        : "border-white/10 hover:border-white/20 focus:border-accent-purple focus:ring-4 focus:ring-accent-purple/10 focus:bg-[#080808]"
                     )}
                   />
                   <label 
                     htmlFor="message" 
                     className={cn(
-                      "absolute left-12 top-4 text-[10px] uppercase tracking-widest font-mono text-gray-500 transition-all duration-300 pointer-events-none px-1",
+                      "absolute left-12 top-4 text-xs sm:text-sm uppercase tracking-widest font-mono text-gray-400 transition-all duration-300 pointer-events-none px-1",
                       formData.message 
-                        ? "-top-2 left-4 text-accent-purple bg-card-bg scale-90" 
-                        : "group-focus-within/input:-top-2 group-focus-within/input:left-4 group-focus-within/input:text-accent-purple group-focus-within/input:bg-card-bg group-focus-within/input:scale-90"
+                        ? "-top-2 left-4 scale-90 text-[10px] text-accent-purple bg-card-bg px-1.5" 
+                        : "group-focus-within/input:-top-2 group-focus-within/input:left-4 group-focus-within/input:scale-90 group-focus-within/input:text-[10px] group-focus-within/input:text-accent-purple group-focus-within/input:bg-card-bg group-focus-within/input:px-1.5"
                     )}
                   >
                     Mensagem
@@ -221,10 +224,10 @@ ${formData.message}`;
                 type="submit"
                 disabled={status === 'submitting'}
                 className={cn(
-                  "w-full py-4.5 rounded-2xl flex items-center justify-center gap-3 transition-all duration-500 font-bold text-[13px] uppercase tracking-widest overflow-hidden relative group/btn shadow-xl active:scale-[0.98] cursor-pointer",
+                  "w-full py-4.5 rounded-2xl flex items-center justify-center gap-3 transition-all duration-500 font-bold text-[13px] uppercase tracking-widest overflow-hidden relative group/btn shadow-xl active:scale-[0.98] cursor-pointer border-2",
                   status === 'submitting' 
-                    ? "bg-gray-800 text-gray-400 cursor-not-allowed" 
-                    : "bg-white text-black hover:bg-gradient-to-r hover:from-[#25D366] hover:to-[#128C7E] hover:text-white"
+                    ? "bg-gray-800 text-gray-400 border-transparent cursor-not-allowed" 
+                    : "bg-black/40 border-accent-purple text-accent-purple hover:bg-gradient-to-r hover:from-[#25D366] hover:to-[#128C7E] hover:text-white hover:border-transparent shadow-[0_0_15px_rgba(139,92,246,0.1)] hover:shadow-[0_0_25px_rgba(37,211,102,0.4)]"
                 )}
               >
                 <span className="relative z-10 flex items-center gap-2.5">
