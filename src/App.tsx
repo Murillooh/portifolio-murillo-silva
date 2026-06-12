@@ -330,6 +330,24 @@ export default function App() {
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [projects, setProjects] = useState<Project[]>(INITIAL_PROJECTS);
+  const [visitorCount, setVisitorCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchVisitorCount = async () => {
+      try {
+        const res = await fetch('https://api.counterapi.dev/v1/portifolio-murillo-silva/visits/up');
+        if (res.ok) {
+          const data = await res.json();
+          if (data && typeof data.count === 'number') {
+            setVisitorCount(data.count);
+          }
+        }
+      } catch (err) {
+        console.error("Erro ao carregar o contador de visitas:", err);
+      }
+    };
+    fetchVisitorCount();
+  }, []);
 
   const [activeTab, setActiveTab] = useState<'about' | 'readme'>('about');
   const [readmeContent, setReadmeContent] = useState<string>('');
@@ -1078,7 +1096,13 @@ export default function App() {
                   </motion.a>
                 </Tooltip>
               </motion.div>
-              <div className="mt-8 text-[10px] sm:text-[11px] font-mono text-gray-500 uppercase tracking-widest">
+              {visitorCount !== null && (
+                <div className="mt-6 flex items-center gap-1.5 text-gray-500 font-mono text-[10px] sm:text-[11px] uppercase tracking-wider justify-end">
+                  <Eye size={12} className="text-accent-purple" />
+                  <span>Visitas: <span className="text-white font-bold">{visitorCount}</span></span>
+                </div>
+              )}
+              <div className="mt-4 text-[10px] sm:text-[11px] font-mono text-gray-500 uppercase tracking-widest">
                 © {new Date().getFullYear()} • Munago Desenvolvedora de Software
               </div>
             </div>
