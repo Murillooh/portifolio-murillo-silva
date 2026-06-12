@@ -24,7 +24,6 @@ import { Preloader } from './components/Preloader';
 import { BackToTop } from './components/BackToTop';
 import { ContactForm } from './components/ContactForm';
 import { FAQSection } from './components/FAQSection';
-import { ExperienceSection } from './components/ExperienceSection';
 import { SkillsSection } from './components/SkillsSection';
 import { marked } from 'marked';
 import Prism from 'prismjs';
@@ -435,7 +434,7 @@ export default function App() {
     };
 
     const observer = new IntersectionObserver(handleIntersect, observerOptions);
-    const sections = ['inicio', 'projetos', 'experiencia', 'habilidades', 'faq', 'contato'];
+    const sections = ['inicio', 'projetos', 'habilidades', 'faq', 'contato'];
     sections.forEach(id => {
       const el = document.getElementById(id);
       if (el) observer.observe(el);
@@ -476,8 +475,6 @@ export default function App() {
       say("Essas são as tecnologias em que sou especialista.");
     } else if (activeSection === 'projetos') {
       say("Confira meus projetos! Cada um foi construído com foco em performance.");
-    } else if (activeSection === 'experiencia') {
-      say("Aqui está um pouco da minha trajetória profissional.");
     } else if (activeSection === 'faq') {
       say("Tem alguma dúvida? Preparei uma lista com as perguntas mais comuns aqui.");
     } else if (activeSection === 'contato') {
@@ -564,17 +561,6 @@ export default function App() {
               )}
             >
               Projetos
-            </a>
-            <a
-              href="#experiencia"
-              role="menuitem"
-              aria-current={activeSection === 'experiencia' ? 'page' : undefined}
-              className={cn(
-                "transition-colors",
-                activeSection === 'experiencia' ? "text-accent-purple" : "text-gray-400 hover:text-accent-purple"
-              )}
-            >
-              Experiência
             </a>
             <a
               href="#habilidades"
@@ -864,9 +850,6 @@ export default function App() {
             </AnimatePresence>
           </motion.div>
         </section>
-
-        {/* Experience Section */}
-        <ExperienceSection />
 
         {/* Skills Section */}
         <SkillsSection />
