@@ -490,13 +490,20 @@ export default function App() {
   return (
     <div>
       <AnimatePresence mode="wait">
-        {loading && <Preloader key="preloader" />}
-      </AnimatePresence>
-
-      <BackToTop />
-      <GlobalSpotlight />
-
-      <div className={cn("min-h-screen pb-20 relative overflow-hidden transition-opacity duration-1000 bg-bg-deep", loading ? "opacity-0" : "opacity-100")}>
+        {loading ? (
+          <Preloader key="preloader" />
+        ) : (
+          <motion.div
+            key="main-content"
+            initial={{ opacity: 0, y: 30, filter: 'blur(12px)' }}
+            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+            transition={{
+              duration: 1.2,
+              ease: [0.16, 1, 0.3, 1],
+              delay: 0.1
+            }}
+            className="min-h-screen pb-20 relative overflow-hidden bg-bg-deep"
+          >
         {/* Persistent Robot Buddy */}
         <div className="fixed top-80 right-4 md:right-6 lg:right-12 z-[999] pointer-events-auto scale-[0.65] sm:scale-90 md:scale-100 origin-top-right">
           <motion.div
@@ -1091,7 +1098,12 @@ export default function App() {
             </div>
           </FadeInView>
         </footer>
-      </div>
-    </div>
+      </motion.div>
+    )}
+  </AnimatePresence>
+
+  <BackToTop />
+  <GlobalSpotlight />
+</div>
   );
 }
