@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Database, 
@@ -8,7 +8,9 @@ import {
   ChevronUp,
   Target,
   Maximize2,
-  Minimize2
+  Minimize2,
+  Brain,
+  Sparkles
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 
@@ -88,91 +90,312 @@ const SKILLS_CATEGORIES = [
   }
 ];
 
+interface Node {
+  id: number;
+  x: number;
+  y: number;
+  icon: any;
+  label: string;
+  color: 'purple' | 'teal' | 'orange';
+  isCenter?: boolean;
+}
+
+const INITIAL_NODES: Node[] = [
+  { id: 0, x: 50, y: 50, icon: Brain, label: 'CÉREBRO COGNITIVO', color: 'purple', isCenter: true },
+  { id: 1, x: 32, y: 30, icon: Layout, label: 'React 19', color: 'purple' },
+  { id: 2, x: 68, y: 30, icon: Database, label: 'Node.js / Express', color: 'teal' },
+  { id: 3, x: 20, y: 50, icon: Cpu, label: 'TypeScript', color: 'orange' },
+  { id: 4, x: 80, y: 50, icon: Database, label: 'PostgreSQL / SQL', color: 'teal' },
+  { id: 5, x: 28, y: 70, icon: Target, label: 'Firebase / NoSQL', color: 'purple' },
+  { id: 6, x: 72, y: 70, icon: Cpu, label: 'Linux & DevOps', color: 'orange' },
+  { id: 7, x: 45, y: 20, icon: Layout, label: 'UI/UX Design', color: 'purple' },
+  { id: 8, x: 38, y: 78, icon: Target, label: 'Automação (GAS)', color: 'orange' },
+  { id: 9, x: 55, y: 80, icon: Cpu, label: 'Capacitor Mobile', color: 'teal' },
+  { id: 10, x: 55, y: 20, icon: Sparkles, label: 'Inteligência Artificial', color: 'purple' }
+];
+
+const EXTRA_NODES: Node[] = [
+  { id: 11, x: 24, y: 16, icon: Layout, label: 'Tailwind CSS', color: 'purple' },
+  { id: 12, x: 14, y: 34, icon: Layout, label: 'Next.js Framework', color: 'purple' },
+  { id: 13, x: 10, y: 60, icon: Sparkles, label: 'Framer Motion', color: 'purple' },
+  { id: 14, x: 44, y: 92, icon: Target, label: 'Recharts API', color: 'purple' },
+  { id: 15, x: 74, y: 92, icon: Cpu, label: 'Git & GitHub', color: 'orange' },
+  { id: 16, x: 88, y: 34, icon: Cpu, label: 'Vite Bundler', color: 'orange' },
+  { id: 17, x: 82, y: 16, icon: Cpu, label: 'Vercel Cloud', color: 'orange' },
+  { id: 18, x: 90, y: 60, icon: Database, label: 'Docker Containers', color: 'teal' }
+];
+
+const PRIMARY_LINKS = [
+  { source: 0, target: 1 },
+  { source: 0, target: 2 },
+  { source: 0, target: 3 },
+  { source: 0, target: 4 },
+  { source: 0, target: 5 },
+  { source: 0, target: 6 },
+  { source: 0, target: 7 },
+  { source: 0, target: 8 },
+  { source: 0, target: 9 },
+  { source: 0, target: 10 },
+  { source: 1, target: 7 },
+  { source: 1, target: 3 },
+  { source: 1, target: 2 },
+  { source: 2, target: 10 },
+  { source: 2, target: 4 },
+  { source: 3, target: 5 },
+  { source: 4, target: 6 },
+  { source: 5, target: 8 },
+  { source: 6, target: 9 },
+  { source: 8, target: 9 }
+];
+
+const EXTRA_LINKS = [
+  { source: 0, target: 11 },
+  { source: 0, target: 12 },
+  { source: 0, target: 13 },
+  { source: 0, target: 14 },
+  { source: 0, target: 15 },
+  { source: 0, target: 16 },
+  { source: 0, target: 17 },
+  { source: 0, target: 18 },
+  { source: 1, target: 11 },
+  { source: 11, target: 12 },
+  { source: 12, target: 13 },
+  { source: 3, target: 13 },
+  { source: 5, target: 14 },
+  { source: 8, target: 15 },
+  { source: 6, target: 18 },
+  { source: 4, target: 18 },
+  { source: 2, target: 16 },
+  { source: 16, target: 17 }
+];
+
 function ConstellationMap({ isMinimized, setIsMinimized }: { isMinimized: boolean, setIsMinimized: (v: boolean) => void }) {
-  const points = [
-    { x: 50, y: 50, icon: Layout, label: 'UI/UX', color: 'purple' },
-    { x: 30, y: 35, icon: Cpu, label: 'Logic', color: 'orange' },
-    { x: 70, y: 35, icon: Database, label: 'Data', color: 'teal' },
-    { x: 25, y: 65, icon: Target, label: 'Goals', color: 'purple' },
-    { x: 75, y: 65, icon: Database, label: 'Scalability', color: 'teal' },
-    { x: 50, y: 20, icon: Layout, label: 'Design', color: 'orange' },
-  ];
+  const [nodes, setNodes] = useState<Node[]>(INITIAL_NODES);
+  const [isBrainExpanded, setIsBrainExpanded] = useState(false);
+  const [activeDragId, setActiveDragId] = useState<number | null>(null);
+  const [ripples, setRipples] = useState<{ id: number }[]>([]);
+  
+  const containerRef = useRef<HTMLDivElement>(null);
+  const dragStartRef = useRef<{ x: number, y: number } | null>(null);
+
+  const toggleExpandBrain = () => {
+    setIsBrainExpanded(prev => {
+      const nextState = !prev;
+      if (nextState) {
+        setNodes(current => {
+          const existingIds = new Set(current.map(n => n.id));
+          const toAdd = EXTRA_NODES.filter(n => !existingIds.has(n.id));
+          return [...current, ...toAdd];
+        });
+      } else {
+        setNodes(current => {
+          return current.filter(n => n.id <= 10);
+        });
+      }
+      return nextState;
+    });
+  };
+
+  const triggerRipple = () => {
+    const newRipple = { id: Date.now() };
+    setRipples(prev => [...prev, newRipple]);
+    setTimeout(() => {
+      setRipples(prev => prev.filter(r => r.id !== newRipple.id));
+    }, 1200);
+  };
+
+  const handlePointerDown = (id: number, e: React.PointerEvent) => {
+    e.currentTarget.setPointerCapture(e.pointerId);
+    setActiveDragId(id);
+    dragStartRef.current = { x: e.clientX, y: e.clientY };
+  };
+
+  const handlePointerMove = (id: number, e: React.PointerEvent) => {
+    if (activeDragId !== id) return;
+    const container = containerRef.current;
+    if (!container) return;
+    const rect = container.getBoundingClientRect();
+    
+    // Convert current client coordinate to container relative percentage
+    const newX = ((e.clientX - rect.left) / rect.width) * 100;
+    const newY = ((e.clientY - rect.top) / rect.height) * 100;
+
+    setNodes(prev =>
+      prev.map(n =>
+        n.id === id
+          ? { ...n, x: Math.max(4, Math.min(96, newX)), y: Math.max(5, Math.min(95, newY)) }
+          : n
+      )
+    );
+  };
+
+  const handlePointerUp = (id: number, e: React.PointerEvent) => {
+    e.currentTarget.releasePointerCapture(e.pointerId);
+    setActiveDragId(null);
+
+    if (dragStartRef.current) {
+      const dx = e.clientX - dragStartRef.current.x;
+      const dy = e.clientY - dragStartRef.current.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      // Tiny move counts as a click
+      if (distance < 5) {
+        if (id === 0) {
+          triggerRipple();
+        }
+      }
+    }
+    dragStartRef.current = null;
+  };
+
+  const centerNode = nodes.find(n => n.id === 0);
+  const cx = centerNode ? centerNode.x : 50;
+  const cy = centerNode ? centerNode.y : 50;
 
   return (
     <motion.div 
       layout
       animate={{ 
-        height: isMinimized ? 150 : 450,
+        height: isMinimized ? 150 : 480,
         opacity: 1
       }}
+      ref={containerRef}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className="w-full max-w-4xl bg-black/40 backdrop-blur-xl border border-white/10 rounded-[40px] relative overflow-hidden group shadow-2xl"
+      className="w-full max-w-4xl bg-black/50 backdrop-blur-xl border border-white/10 rounded-[40px] relative overflow-hidden group shadow-2xl select-none touch-none"
     >
+      {/* Styles for dashed stroke-dashoffset animation */}
+      <style>{`
+        @keyframes synapse-glow {
+          0% { stroke-dashoffset: 24; }
+          100% { stroke-dashoffset: 0; }
+        }
+        .synapse-pulse {
+          stroke-dasharray: 6, 12;
+          animation: synapse-glow 1.2s linear infinite;
+        }
+        .synapse-pulse-fast {
+          stroke-dasharray: 4, 8;
+          animation: synapse-glow 0.8s linear infinite;
+        }
+      `}</style>
+
       {/* Background Grid/Stars */}
       <div className="absolute inset-0 opacity-20 pointer-events-none">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--color-accent-purple)_0%,_transparent_70%)] opacity-10" />
-        <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+        <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle, #333 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
       </div>
 
+      {/* Ripple Expand Waves Behind Nodes */}
+      <AnimatePresence>
+        {ripples.map((ripple) => (
+          <motion.div
+            key={ripple.id}
+            style={{ left: `${cx}%`, top: `${cy}%` }}
+            initial={{ scale: 0, opacity: 0.8 }}
+            animate={{ scale: 3.5, opacity: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.2, ease: "easeOut" }}
+            className="absolute -translate-x-1/2 -translate-y-1/2 w-36 h-36 rounded-full border border-accent-purple bg-accent-purple/5 shadow-[0_0_40px_rgba(139,92,246,0.35)] pointer-events-none z-0"
+          />
+        ))}
+      </AnimatePresence>
+
+      {/* SVG Neural Connections */}
       <svg className={cn("absolute inset-0 w-full h-full pointer-events-none transition-opacity duration-500", isMinimized ? "opacity-20 blur-sm" : "opacity-100")}>
-        {/* Connection Lines */}
-        {points.map((p1, i) => 
-          points.slice(i + 1).map((p2, j) => (
-            <motion.line
-              key={`${i}-${j}`}
-              x1={`${p1.x}%`}
-              y1={`${p1.y}%`}
-              x2={`${p2.x}%`}
-              y2={`${p2.y}%`}
-              stroke="white"
-              strokeWidth="0.5"
-              initial={{ opacity: 0.05 }}
-              animate={{ opacity: [0.05, 0.15, 0.05] }}
-              transition={{ duration: 4, repeat: Infinity, delay: (i + j) * 0.5 }}
-            />
-          ))
-        )}
+        {(isBrainExpanded ? [...PRIMARY_LINKS, ...EXTRA_LINKS] : PRIMARY_LINKS).map((link, idx) => {
+          const sNode = nodes.find(n => n.id === link.source);
+          const tNode = nodes.find(n => n.id === link.target);
+          if (!sNode || !tNode) return null;
+          
+          const isCore = link.source === 0 || link.target === 0;
+          
+          return (
+            <g key={idx}>
+              {/* Static background lines */}
+              <line
+                x1={`${sNode.x}%`}
+                y1={`${sNode.y}%`}
+                x2={`${tNode.x}%`}
+                y2={`${tNode.y}%`}
+                className={isCore ? "stroke-accent-purple/20 stroke-[1]" : "stroke-white/5 stroke-[0.5]"}
+              />
+              {/* Active pulsing dash lines */}
+              <line
+                x1={`${sNode.x}%`}
+                y1={`${sNode.y}%`}
+                x2={`${tNode.x}%`}
+                y2={`${tNode.y}%`}
+                className={cn(
+                  isCore 
+                    ? "stroke-accent-teal/40 stroke-[1.5] synapse-pulse-fast" 
+                    : "stroke-accent-purple/15 stroke-[0.8] synapse-pulse"
+                )}
+              />
+            </g>
+          );
+        })}
       </svg>
 
+      {/* Nodes Render Container */}
       <div className={cn("relative w-full h-full transition-all duration-500", isMinimized ? "scale-90 opacity-20" : "scale-100 opacity-100")}>
-        {points.map((point, idx) => {
+        {!isMinimized && nodes.map((point) => {
           const Icon = point.icon;
           const colors = {
-            purple: 'text-accent-purple border-accent-purple/30 bg-accent-purple/10',
-            teal: 'text-accent-teal border-accent-teal/30 bg-accent-teal/10',
-            orange: 'text-accent-orange border-accent-orange/30 bg-accent-orange/10',
+            purple: 'text-accent-purple border-accent-purple/30 bg-accent-purple/10 hover:border-accent-purple/60 shadow-[0_0_15px_rgba(139,92,246,0.15)]',
+            teal: 'text-accent-teal border-accent-teal/30 bg-accent-teal/10 hover:border-accent-teal/60 shadow-[0_0_15px_rgba(20,184,166,0.15)]',
+            orange: 'text-accent-orange border-accent-orange/30 bg-accent-orange/10 hover:border-accent-orange/60 shadow-[0_0_15px_rgba(249,115,22,0.15)]',
           };
+          
+          const isCore = point.isCenter;
           
           return (
             <motion.div
-              key={idx}
+              key={point.id}
               style={{ left: `${point.x}%`, top: `${point.y}%` }}
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ 
-                opacity: 1, 
-                scale: 1,
-                y: [0, -10, 0],
-                x: [0, 5, 0]
-              }}
-              transition={{ 
-                opacity: { duration: 0.5, delay: idx * 0.1 },
-                scale: { duration: 0.5, delay: idx * 0.1 },
-                y: { duration: 3 + idx, repeat: Infinity, ease: "easeInOut" },
-                x: { duration: 4 + idx, repeat: Infinity, ease: "easeInOut" }
-              }}
-              className="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-2"
+              className="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-1.5 z-20"
+              animate={isCore ? {
+                scale: [1, 1.04, 1],
+              } : undefined}
+              transition={isCore ? {
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut"
+              } : undefined}
             >
               <Tooltip content={point.label}>
-                <div className={cn(
-                  "p-4 rounded-2xl border backdrop-blur-md shadow-[0_0_20px_rgba(0,0,0,0.5)] transition-all group-hover:scale-110",
-                  colors[point.color as keyof typeof colors]
-                )}>
-                  <Icon size={24} />
+                <div
+                  onPointerDown={(e) => handlePointerDown(point.id, e)}
+                  onPointerMove={(e) => handlePointerMove(point.id, e)}
+                  onPointerUp={(e) => handlePointerUp(point.id, e)}
+                  className={cn(
+                    "rounded-2xl border backdrop-blur-md transition-transform flex items-center justify-center select-none",
+                    isCore 
+                      ? "p-5 rounded-full border-accent-purple bg-black/60 shadow-[0_0_30px_rgba(139,92,246,0.45)] cursor-pointer text-accent-purple hover:scale-105 active:scale-95" 
+                      : "p-4 cursor-grab active:cursor-grabbing hover:scale-110",
+                    colors[point.color]
+                  )}
+                >
+                  <Icon size={isCore ? 28 : 20} className={isCore ? "animate-pulse" : ""} />
                 </div>
               </Tooltip>
-              <span className="text-[10px] font-mono whitespace-nowrap text-gray-500 uppercase tracking-widest bg-black/50 px-2 py-0.5 rounded border border-white/5">
+              <span className={cn(
+                "text-[9px] font-mono whitespace-nowrap uppercase tracking-widest bg-black/60 px-2 py-0.5 rounded border border-white/5 shadow-md",
+                isCore ? "text-accent-purple border-accent-purple/20 font-bold" : "text-gray-400"
+              )}>
                 {point.label}
               </span>
+              {isCore && (
+                <button
+                  onPointerDown={(e) => e.stopPropagation()} // Prevent dragging when interacting with button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleExpandBrain();
+                  }}
+                  className="mt-1 px-3 py-1 bg-accent-purple/20 hover:bg-accent-purple/40 border border-accent-purple/40 hover:border-accent-purple rounded-full text-[8px] font-bold font-mono text-white tracking-widest uppercase transition-all shadow-[0_0_10px_rgba(139,92,246,0.15)] hover:shadow-[0_0_15px_rgba(139,92,246,0.4)] active:scale-95 cursor-pointer z-30"
+                >
+                  {isBrainExpanded ? "Reduzir Cérebro" : "Expandir Cérebro (+8)"}
+                </button>
+              )}
             </motion.div>
           );
         })}
@@ -181,24 +404,26 @@ function ConstellationMap({ isMinimized, setIsMinimized }: { isMinimized: boolea
       {/* Map Controls */}
       <button 
         onClick={() => setIsMinimized(!isMinimized)}
-        className="absolute top-6 right-6 z-30 p-3 bg-black/60 backdrop-blur-xl border border-white/10 rounded-2xl text-white hover:bg-accent-purple/20 transition-all active:scale-90"
+        className="absolute top-6 right-6 z-30 p-3 bg-black/60 backdrop-blur-xl border border-white/10 rounded-2xl text-white hover:bg-accent-purple/20 transition-all active:scale-90 cursor-pointer"
         title={isMinimized ? "Expandir Mapa" : "Minimizar Mapa"}
       >
-        {isMinimized ? <Maximize2 size={20} /> : <Minimize2 size={20} />}
+        {isMinimized ? <Maximize2 size={18} /> : <Minimize2 size={18} />}
       </button>
 
       {isMinimized && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <span className="text-[10px] font-mono text-accent-purple uppercase tracking-[0.4em] opacity-50">Skill Universe Map</span>
+          <span className="text-[10px] font-mono text-accent-purple uppercase tracking-[0.4em] opacity-50">Skill Brain Network</span>
         </div>
       )}
 
       {/* Center Label (When not minimized) */}
       {!isMinimized && (
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-center pointer-events-none">
-          <div className="flex items-center gap-2 bg-black/60 border border-white/10 px-4 py-2 rounded-full backdrop-blur-xl">
-            <div className="w-1.5 h-1.5 rounded-full bg-accent-purple animate-pulse" />
-            <p className="text-[10px] font-mono text-gray-300 uppercase tracking-widest">Tecnologias & Arquitetura</p>
+          <div className="flex items-center gap-2 bg-black/70 border border-white/10 px-4 py-2 rounded-full backdrop-blur-xl">
+            <div className="w-1.5 h-1.5 rounded-full bg-accent-teal animate-pulse" />
+            <p className="text-[9px] font-mono text-gray-400 uppercase tracking-widest">
+              Arraste os nós para moldar o cérebro
+            </p>
           </div>
         </div>
       )}
@@ -232,7 +457,7 @@ export function SkillsSection() {
         <div className="flex justify-center mb-16 relative z-30">
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="group relative flex items-center gap-4 px-8 py-4 bg-black border-[3px] border-accent-purple rounded-full text-white font-bold text-lg hover:scale-105 transition-all shadow-[0_0_25px_rgba(168,85,247,0.3)] hover:shadow-[0_0_40px_rgba(168,85,247,0.5)] active:scale-95"
+            className="group relative flex items-center gap-4 px-8 py-4 bg-black border-[3px] border-accent-purple rounded-full text-white font-bold text-lg hover:scale-105 transition-all shadow-[0_0_25px_rgba(168,85,247,0.3)] hover:shadow-[0_0_40px_rgba(168,85,247,0.5)] active:scale-95 cursor-pointer"
           >
             {isExpanded ? (
               <>Recolher Detalhes <ChevronUp size={22} className="group-hover:-translate-y-1 transition-transform" /></>
