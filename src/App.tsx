@@ -493,44 +493,30 @@ export default function App() {
         {loading ? (
           <Preloader key="preloader" />
         ) : (
-          <motion.div
-            key="main-content"
-            initial={{ opacity: 0, y: 30, filter: 'blur(12px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-            transition={{
-              duration: 1.2,
-              ease: [0.16, 1, 0.3, 1],
-              delay: 0.1
-            }}
-            className="min-h-screen pb-20 relative overflow-hidden bg-bg-deep"
-          >
-        {/* Persistent Robot Buddy */}
-        <div className="fixed top-80 right-4 md:right-6 lg:right-12 z-[999] pointer-events-auto scale-[0.65] sm:scale-90 md:scale-100 origin-top-right">
-          <motion.div
-            initial={{ opacity: 0, scale: 0, y: -100 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{
-              type: "spring",
-              stiffness: 260,
-              damping: 20,
-              delay: 0.5
-            }}
-          >
-            <Robot visitorCount={visitorCount} />
-          </motion.div>
-        </div>
-
-        {/* Background Decor */}
-        <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-0">
-          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-accent-purple/5 blur-[120px] rounded-full" />
-          <div className="absolute bottom-[20%] right-[-10%] w-[30%] h-[30%] bg-accent-teal/5 blur-[120px] rounded-full" />
-
-          {/* Subtle Grid / Noise */}
-          <div className="absolute inset-0 opacity-[0.02] pointer-events-none mix-blend-overlay bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
-        </div>
+          <div className="min-h-screen relative bg-bg-deep">
+            {/* Persistent Robot Buddy */}
+            <div className="fixed top-80 right-4 md:right-6 lg:right-12 z-[999] pointer-events-auto scale-[0.65] sm:scale-90 md:scale-100 origin-top-right">
+              <motion.div
+                initial={{ opacity: 0, scale: 0, y: -100 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 260,
+                  damping: 20,
+                  delay: 0.5
+                }}
+              >
+                <Robot visitorCount={visitorCount} />
+              </motion.div>
+            </div>
 
         {/* Navbar */}
-        <nav className="fixed top-0 left-0 w-full z-50 glass px-4 md:px-6 py-3 md:py-4 flex justify-between items-center">
+        <motion.nav
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="fixed top-0 left-0 w-full z-50 glass px-4 md:px-6 py-3 md:py-4 flex justify-between items-center"
+        >
           <div className="text-accent-purple font-mono flex items-center gap-2 text-sm md:text-base">
             <Code2 size={20} className="w-4 h-4 md:w-5 md:h-5" />
             <span className="tracking-tighter font-bold">JS / {">"}</span>
@@ -592,10 +578,29 @@ export default function App() {
               Contato
             </a>
           </div>
-        </nav>
+        </motion.nav>
 
-        {/* Hero Section */}
-        <section id="inicio" className="pt-32 md:pt-40 pb-16 md:pb-20 px-4 md:px-6 max-w-7xl mx-auto">
+        {/* Scrollable Content Container (Transformed entrance animation) */}
+        <motion.div
+          key="scrollable-content"
+          initial={{ opacity: 0, y: 30, filter: 'blur(12px)' }}
+          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+          transition={{
+            duration: 1.2,
+            ease: [0.16, 1, 0.3, 1],
+            delay: 0.1
+          }}
+          className="w-full min-h-screen flex flex-col relative overflow-hidden pb-20"
+        >
+          {/* Background Decor */}
+          <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-0">
+            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-accent-purple/5 blur-[120px] rounded-full" />
+            <div className="absolute bottom-[20%] right-[-10%] w-[30%] h-[30%] bg-accent-teal/5 blur-[120px] rounded-full" />
+            <div className="absolute inset-0 opacity-[0.02] pointer-events-none mix-blend-overlay bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
+          </div>
+
+          {/* Hero Section */}
+          <section id="inicio" className="pt-32 md:pt-40 pb-16 md:pb-20 px-4 md:px-6 max-w-7xl mx-auto">
           <motion.div
             variants={STAGGER_CONTAINER}
             initial="hidden"
@@ -841,181 +846,7 @@ export default function App() {
         {/* Skills Section */}
         <SkillsSection />
 
-        {/* Modal */}
-        <AnimatePresence>
-          {selectedProject && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setSelectedProject(null)}
-                className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-              />
-              <motion.div
-                layoutId={`project-${selectedProject.id}`}
-                initial={{ opacity: 0, y: 100 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 100 }}
-                transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                className="relative w-full max-w-4xl bg-card-bg border border-card-border rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl max-h-[90vh] md:max-h-[85vh] flex flex-col md:flex-row mt-12 md:mt-0"
-              >
-                <button
-                  onClick={() => setSelectedProject(null)}
-                  className="absolute top-4 right-4 z-50 p-2 bg-black/50 border border-white/10 rounded-full text-white hover:bg-black transition-colors"
-                >
-                  <X size={20} />
-                </button>
-
-                <motion.div
-                  layoutId={`project-image-${selectedProject.id}`}
-                  className="w-full md:w-1/2 aspect-video md:aspect-auto bg-black relative"
-                >
-                  {selectedProject.previewUrl ? (
-                    <LazyImage
-                      src={selectedProject.previewUrl}
-                      alt={selectedProject.name}
-                      containerClassName="absolute inset-0 w-full h-full"
-                      className="absolute inset-0 w-full h-full object-contain"
-                    />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center text-gray-500">
-                      <Layers size={80} />
-                    </div>
-                  )}
-                </motion.div>
-
-                <div className="w-full md:w-1/2 p-6 md:p-12 overflow-y-auto">
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="mb-6"
-                  >
-                    <span className="text-accent-teal uppercase tracking-widest font-mono text-[9px] md:text-[10px] block mb-2">{selectedProject.url}</span>
-                    <h2 className="text-2xl md:text-4xl font-display mb-3 md:mb-4">{selectedProject.name}</h2>
-                  </motion.div>
-
-                  {/* Tabs */}
-                  {selectedProject.githubUrl && (
-                    <div className="flex border-b border-white/10 mb-6 gap-6">
-                      <button
-                        onClick={() => setActiveTab('about')}
-                        className={cn(
-                          "pb-2 text-xs md:text-sm font-mono uppercase tracking-wider transition-colors border-b-2 font-bold cursor-pointer",
-                          activeTab === 'about'
-                            ? "text-accent-purple border-accent-purple"
-                            : "text-gray-400 border-transparent hover:text-white"
-                        )}
-                      >
-                        Sobre
-                      </button>
-                      <button
-                        onClick={() => {
-                          setActiveTab('readme');
-                          if (readmeStatus === 'idle') {
-                            loadReadme(selectedProject.githubUrl!, selectedProject.id);
-                          }
-                        }}
-                        className={cn(
-                          "pb-2 text-xs md:text-sm font-mono uppercase tracking-wider transition-colors border-b-2 font-bold cursor-pointer",
-                          activeTab === 'readme'
-                            ? "text-accent-purple border-accent-purple"
-                            : "text-gray-400 border-transparent hover:text-white"
-                        )}
-                      >
-                        README.md
-                      </button>
-                    </div>
-                  )}
-
-                  {activeTab === 'about' ? (
-                    <>
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2 }}
-                        className="mb-6 md:mb-8"
-                      >
-                        <p className="text-gray-400 leading-relaxed text-xs md:text-sm">
-                          {selectedProject.description}
-                          {selectedProject.description.length < 100 && " Este é um projeto desenvolvido com as melhores práticas de mercado, focado em entregar uma solução robusta e escalável para o usuário final."}
-                        </p>
-                      </motion.div>
-
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3 }}
-                        className="mb-10"
-                      >
-                        <h4 className="text-[10px] font-mono uppercase tracking-widest text-gray-500 mb-4">Tecnologias Utilizadas</h4>
-                        <div className="flex flex-wrap gap-3">
-                          {selectedProject.tags.map(tag => (
-                            <span key={tag} className="px-4 py-1.5 bg-accent-purple/10 border border-accent-purple/20 text-accent-purple rounded-full font-mono text-xs font-bold uppercase">
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      </motion.div>
-                    </>
-                  ) : (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="mb-10"
-                    >
-                      {readmeStatus === 'loading' && <ReadmeSkeleton />}
-                      {readmeStatus === 'error' && (
-                        <div className="flex flex-col items-start gap-3 py-4">
-                          <p className="text-red-500 text-xs font-mono">Erro ao carregar o README do GitHub.</p>
-                          <button
-                            onClick={() => loadReadme(selectedProject.githubUrl!, selectedProject.id)}
-                            className="bg-white/5 border border-white/10 hover:bg-white/10 text-white font-mono text-xs px-4 py-2 rounded-lg cursor-pointer"
-                          >
-                            Tentar novamente
-                          </button>
-                        </div>
-                      )}
-                      {readmeStatus === 'success' && (
-                        <div 
-                          className="readme-content" 
-                          dangerouslySetInnerHTML={{ __html: readmeContent }} 
-                        />
-                      )}
-                    </motion.div>
-                  )}
-
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 }}
-                    className="flex flex-col sm:flex-row gap-4"
-                  >
-                    <a
-                      href={`https://${selectedProject.url}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="flex-1 bg-white text-black font-bold py-4 rounded-xl flex items-center justify-center gap-3 hover:bg-accent-teal transition-all active:scale-95 group/btn"
-                    >
-                      Ver Site <ExternalLink size={18} className="group-hover/btn:translate-x-1 transition-transform" />
-                    </a>
-                    {selectedProject.githubUrl && (
-                      <a
-                        href={selectedProject.githubUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="flex-1 bg-card-bg border border-white/20 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-3 hover:bg-white/10 transition-all active:scale-95 group/git"
-                      >
-                        GitHub <Github size={18} className="group-hover/git:rotate-12 transition-transform" />
-                      </a>
-                    )}
-                  </motion.div>
-                </div>
-              </motion.div>
-            </div>
-          )}
-        </AnimatePresence>
+        {/* Modal is moved to the root sibling wrapper to avoid fixed coordinate ancestor transforms */}
 
         {/* FAQ Section */}
         <FAQSection />
@@ -1099,11 +930,188 @@ export default function App() {
           </FadeInView>
         </footer>
       </motion.div>
-    )}
-  </AnimatePresence>
 
-  <BackToTop />
-  <GlobalSpotlight />
+      {/* Modal is rendered outside the transformed motion.div */}
+      <AnimatePresence>
+        {selectedProject && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedProject(null)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            />
+            <motion.div
+              layoutId={`project-${selectedProject.id}`}
+              initial={{ opacity: 0, y: 100 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 100 }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="relative w-full max-w-4xl bg-card-bg border border-card-border rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl max-h-[90vh] md:max-h-[85vh] flex flex-col md:flex-row mt-12 md:mt-0"
+            >
+              <button
+                onClick={() => setSelectedProject(null)}
+                className="absolute top-4 right-4 z-50 p-2 bg-black/50 border border-white/10 rounded-full text-white hover:bg-black transition-colors"
+              >
+                <X size={20} />
+              </button>
+
+              <motion.div
+                layoutId={`project-image-${selectedProject.id}`}
+                className="w-full md:w-1/2 aspect-video md:aspect-auto bg-black relative"
+              >
+                {selectedProject.previewUrl ? (
+                  <LazyImage
+                    src={selectedProject.previewUrl}
+                    alt={selectedProject.name}
+                    containerClassName="absolute inset-0 w-full h-full"
+                    className="absolute inset-0 w-full h-full object-contain"
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center text-gray-500">
+                    <Layers size={80} />
+                  </div>
+                )}
+              </motion.div>
+
+              <div className="w-full md:w-1/2 p-6 md:p-12 overflow-y-auto">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="mb-6"
+                >
+                  <span className="text-accent-teal uppercase tracking-widest font-mono text-[9px] md:text-[10px] block mb-2">{selectedProject.url}</span>
+                  <h2 className="text-2xl md:text-4xl font-display mb-3 md:mb-4">{selectedProject.name}</h2>
+                </motion.div>
+
+                {/* Tabs */}
+                {selectedProject.githubUrl && (
+                  <div className="flex border-b border-white/10 mb-6 gap-6">
+                    <button
+                      onClick={() => setActiveTab('about')}
+                      className={cn(
+                        "pb-2 text-xs md:text-sm font-mono uppercase tracking-wider transition-colors border-b-2 font-bold cursor-pointer",
+                        activeTab === 'about'
+                          ? "text-accent-purple border-accent-purple"
+                          : "text-gray-400 border-transparent hover:text-white"
+                      )}
+                    >
+                      Sobre
+                    </button>
+                    <button
+                      onClick={() => {
+                        setActiveTab('readme');
+                        if (readmeStatus === 'idle') {
+                          loadReadme(selectedProject.githubUrl!, selectedProject.id);
+                        }
+                      }}
+                      className={cn(
+                        "pb-2 text-xs md:text-sm font-mono uppercase tracking-wider transition-colors border-b-2 font-bold cursor-pointer",
+                        activeTab === 'readme'
+                          ? "text-accent-purple border-accent-purple"
+                          : "text-gray-400 border-transparent hover:text-white"
+                      )}
+                    >
+                      README.md
+                    </button>
+                  </div>
+                )}
+
+                {activeTab === 'about' ? (
+                  <>
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                      className="mb-6 md:mb-8"
+                    >
+                      <p className="text-gray-400 leading-relaxed text-xs md:text-sm">
+                        {selectedProject.description}
+                        {selectedProject.description.length < 100 && " Este é um projeto desenvolvido com as melhores práticas de mercado, focado em entregar uma solução robusta e escalável para o usuário final."}
+                      </p>
+                    </motion.div>
+
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3 }}
+                      className="mb-10"
+                    >
+                      <h4 className="text-[10px] font-mono uppercase tracking-widest text-gray-500 mb-4">Tecnologias Utilizadas</h4>
+                      <div className="flex flex-wrap gap-3">
+                        {selectedProject.tags.map(tag => (
+                          <span key={tag} className="px-4 py-1.5 bg-accent-purple/10 border border-accent-purple/20 text-accent-purple rounded-full font-mono text-xs font-bold uppercase">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </motion.div>
+                  </>
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="mb-10"
+                  >
+                    {readmeStatus === 'loading' && <ReadmeSkeleton />}
+                    {readmeStatus === 'error' && (
+                      <div className="flex flex-col items-start gap-3 py-4">
+                        <p className="text-red-500 text-xs font-mono">Erro ao carregar o README do GitHub.</p>
+                        <button
+                          onClick={() => loadReadme(selectedProject.githubUrl!, selectedProject.id)}
+                          className="bg-white/5 border border-white/10 hover:bg-white/10 text-white font-mono text-xs px-4 py-2 rounded-lg cursor-pointer"
+                        >
+                          Tentar novamente
+                        </button>
+                      </div>
+                    )}
+                    {readmeStatus === 'success' && (
+                      <div 
+                        className="readme-content" 
+                        dangerouslySetInnerHTML={{ __html: readmeContent }} 
+                      />
+                    )}
+                  </motion.div>
+                )}
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="flex flex-col sm:flex-row gap-4"
+                >
+                  <a
+                    href={`https://${selectedProject.url}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex-1 bg-white text-black font-bold py-4 rounded-xl flex items-center justify-center gap-3 hover:bg-accent-teal transition-all active:scale-95 group/btn"
+                  >
+                    Ver Site <ExternalLink size={18} className="group-hover/btn:translate-x-1 transition-transform" />
+                  </a>
+                  {selectedProject.githubUrl && (
+                    <a
+                      href={selectedProject.githubUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex-1 bg-card-bg border border-white/20 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-3 hover:bg-white/10 transition-all active:scale-95 group/git"
+                    >
+                      GitHub <Github size={18} className="group-hover/git:rotate-12 transition-transform" />
+                    </a>
+                  )}
+                </motion.div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </div>
+  )}
+</AnimatePresence>
+
+<BackToTop />
+<GlobalSpotlight />
 </div>
   );
 }
