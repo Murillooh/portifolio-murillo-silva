@@ -102,16 +102,16 @@ interface Node {
 
 const INITIAL_NODES: Node[] = [
   { id: 0, x: 50, y: 50, icon: Brain, label: 'CÉREBRO COGNITIVO', color: 'purple', isCenter: true },
-  { id: 1, x: 32, y: 30, icon: Layout, label: 'React 19', color: 'purple' },
-  { id: 2, x: 68, y: 30, icon: Database, label: 'Node.js / Express', color: 'teal' },
-  { id: 3, x: 20, y: 50, icon: Cpu, label: 'TypeScript', color: 'orange' },
-  { id: 4, x: 80, y: 50, icon: Database, label: 'PostgreSQL / SQL', color: 'teal' },
-  { id: 5, x: 28, y: 70, icon: Target, label: 'Firebase / NoSQL', color: 'purple' },
-  { id: 6, x: 72, y: 70, icon: Cpu, label: 'Linux & DevOps', color: 'orange' },
-  { id: 7, x: 45, y: 20, icon: Layout, label: 'UI/UX Design', color: 'purple' },
-  { id: 8, x: 38, y: 78, icon: Target, label: 'Automação (GAS)', color: 'orange' },
-  { id: 9, x: 55, y: 80, icon: Cpu, label: 'Capacitor Mobile', color: 'teal' },
-  { id: 10, x: 55, y: 20, icon: Sparkles, label: 'Inteligência Artificial', color: 'purple' }
+  { id: 1, x: 30, y: 32, icon: Layout, label: 'React 19', color: 'purple' },
+  { id: 2, x: 70, y: 32, icon: Database, label: 'Node.js / Express', color: 'teal' },
+  { id: 3, x: 18, y: 50, icon: Cpu, label: 'TypeScript', color: 'orange' },
+  { id: 4, x: 82, y: 50, icon: Database, label: 'PostgreSQL / SQL', color: 'teal' },
+  { id: 5, x: 25, y: 68, icon: Target, label: 'Firebase / NoSQL', color: 'purple' },
+  { id: 6, x: 75, y: 68, icon: Cpu, label: 'Linux & DevOps', color: 'orange' },
+  { id: 7, x: 38, y: 18, icon: Layout, label: 'UI/UX Design', color: 'purple' },
+  { id: 8, x: 38, y: 82, icon: Target, label: 'Automação (GAS)', color: 'orange' },
+  { id: 9, x: 62, y: 82, icon: Cpu, label: 'Capacitor Mobile', color: 'teal' },
+  { id: 10, x: 62, y: 18, icon: Sparkles, label: 'Inteligência Artificial', color: 'purple' }
 ];
 
 const EXTRA_NODES: Node[] = [
@@ -173,6 +173,7 @@ function ConstellationMap({ isMinimized, setIsMinimized }: { isMinimized: boolea
   const [nodes, setNodes] = useState<Node[]>(INITIAL_NODES);
   const [isBrainExpanded, setIsBrainExpanded] = useState(false);
   const [activeDragId, setActiveDragId] = useState<number | null>(null);
+  const [hoveredNodeId, setHoveredNodeId] = useState<number | null>(null);
   const [ripples, setRipples] = useState<{ id: number }[]>([]);
   
   const containerRef = useRef<HTMLDivElement>(null);
@@ -277,6 +278,36 @@ function ConstellationMap({ isMinimized, setIsMinimized }: { isMinimized: boolea
           stroke-dasharray: 4, 8;
           animation: synapse-glow 0.8s linear infinite;
         }
+        @keyframes float-even {
+          0% { translate: 0px 0px; }
+          50% { translate: 2px -4px; }
+          100% { translate: 0px 0px; }
+        }
+        @keyframes float-odd {
+          0% { translate: 0px 0px; }
+          50% { translate: -3px 3px; }
+          100% { translate: 0px 0px; }
+        }
+        .animate-float-even {
+          animation: float-even 6s ease-in-out infinite;
+        }
+        .animate-float-odd {
+          animation: float-odd 5s ease-in-out infinite;
+        }
+        @keyframes spin-clockwise {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        @keyframes spin-counter {
+          from { transform: rotate(360deg); }
+          to { transform: rotate(0deg); }
+        }
+        .animate-spin-slow {
+          animation: spin-clockwise 25s linear infinite;
+        }
+        .animate-spin-reverse-slow {
+          animation: spin-counter 35s linear infinite;
+        }
       `}</style>
 
       {/* Background Grid/Stars */}
@@ -302,22 +333,54 @@ function ConstellationMap({ isMinimized, setIsMinimized }: { isMinimized: boolea
 
       {/* SVG Neural Connections */}
       <svg className={cn("absolute inset-0 w-full h-full pointer-events-none transition-opacity duration-500", isMinimized ? "opacity-20 blur-sm" : "opacity-100")}>
+        {/* Concentric rotating SVG cognitive brainwave rings */}
+        {!isMinimized && (
+          <>
+            <circle
+              cx={`${cx}%`}
+              cy={`${cy}%`}
+              r="52"
+              className="stroke-accent-purple/30 stroke-[1.2] fill-none animate-spin-slow pointer-events-none"
+              strokeDasharray="6 12"
+              style={{ transformOrigin: `${cx}% ${cy}%` }}
+            />
+            <circle
+              cx={`${cx}%`}
+              cy={`${cy}%`}
+              r="68"
+              className="stroke-accent-teal/20 stroke-[0.8] fill-none animate-spin-reverse-slow pointer-events-none"
+              strokeDasharray="4 14"
+              style={{ transformOrigin: `${cx}% ${cy}%` }}
+            />
+          </>
+        )}
+
         {(isBrainExpanded ? [...PRIMARY_LINKS, ...EXTRA_LINKS] : PRIMARY_LINKS).map((link, idx) => {
           const sNode = nodes.find(n => n.id === link.source);
           const tNode = nodes.find(n => n.id === link.target);
           if (!sNode || !tNode) return null;
           
           const isCore = link.source === 0 || link.target === 0;
+          const isHovered = hoveredNodeId !== null;
+          const isConnectedToHovered = link.source === hoveredNodeId || link.target === hoveredNodeId;
+          
+          let lineOpacity = "opacity-100";
+          if (isHovered) {
+            lineOpacity = isConnectedToHovered ? "opacity-100" : "opacity-20 transition-opacity duration-300";
+          }
           
           return (
-            <g key={idx}>
+            <g key={idx} className={lineOpacity}>
               {/* Static background lines */}
               <line
                 x1={`${sNode.x}%`}
                 y1={`${sNode.y}%`}
                 x2={`${tNode.x}%`}
                 y2={`${tNode.y}%`}
-                className={isCore ? "stroke-accent-purple/20 stroke-[1]" : "stroke-white/5 stroke-[0.5]"}
+                className={cn(
+                  isCore ? "stroke-accent-purple/20 stroke-[1]" : "stroke-white/5 stroke-[0.5]",
+                  isConnectedToHovered && "stroke-accent-purple/40 stroke-[1.2]"
+                )}
               />
               {/* Active pulsing dash lines */}
               <line
@@ -328,7 +391,12 @@ function ConstellationMap({ isMinimized, setIsMinimized }: { isMinimized: boolea
                 className={cn(
                   isCore 
                     ? "stroke-accent-teal/40 stroke-[1.5] synapse-pulse-fast" 
-                    : "stroke-accent-purple/15 stroke-[0.8] synapse-pulse"
+                    : "stroke-accent-purple/15 stroke-[0.8] synapse-pulse",
+                  isConnectedToHovered && (
+                    isCore 
+                      ? "stroke-accent-teal/80 stroke-[2] synapse-pulse-fast" 
+                      : "stroke-accent-purple/60 stroke-[1.2] synapse-pulse"
+                  )
                 )}
               />
             </g>
@@ -341,26 +409,47 @@ function ConstellationMap({ isMinimized, setIsMinimized }: { isMinimized: boolea
         {!isMinimized && nodes.map((point) => {
           const Icon = point.icon;
           const colors = {
-            purple: 'text-accent-purple border-accent-purple/30 bg-accent-purple/10 hover:border-accent-purple/60 shadow-[0_0_15px_rgba(139,92,246,0.15)]',
-            teal: 'text-accent-teal border-accent-teal/30 bg-accent-teal/10 hover:border-accent-teal/60 shadow-[0_0_15px_rgba(20,184,166,0.15)]',
-            orange: 'text-accent-orange border-accent-orange/30 bg-accent-orange/10 hover:border-accent-orange/60 shadow-[0_0_15px_rgba(249,115,22,0.15)]',
+            purple: 'text-accent-purple border-accent-purple/30 bg-accent-purple/10 hover:border-accent-purple/70 hover:shadow-[0_0_25px_rgba(139,92,246,0.4)] shadow-[0_0_15px_rgba(139,92,246,0.15)]',
+            teal: 'text-accent-teal border-accent-teal/30 bg-accent-teal/10 hover:border-accent-teal/70 hover:shadow-[0_0_25px_rgba(20,184,166,0.4)] shadow-[0_0_15px_rgba(20,184,166,0.15)]',
+            orange: 'text-accent-orange border-accent-orange/30 bg-accent-orange/10 hover:border-accent-orange/70 hover:shadow-[0_0_25px_rgba(249,115,22,0.4)] shadow-[0_0_15px_rgba(249,115,22,0.15)]',
           };
           
           const isCore = point.isCenter;
+          const isHovered = hoveredNodeId === point.id;
           
           return (
             <motion.div
               key={point.id}
               style={{ left: `${point.x}%`, top: `${point.y}%` }}
-              className="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-1.5 z-20"
+              onMouseEnter={() => setHoveredNodeId(point.id)}
+              onMouseLeave={() => setHoveredNodeId(null)}
+              className={cn(
+                "absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-1.5 z-20 transition-transform duration-300",
+                activeDragId !== point.id && (point.id % 2 === 0 ? "animate-float-even" : "animate-float-odd")
+              )}
+              initial={isCore ? { opacity: 0 } : { opacity: 0, scale: 0 }}
               animate={isCore ? {
+                opacity: 1,
                 scale: [1, 1.04, 1],
-              } : undefined}
+              } : {
+                opacity: 1,
+                scale: 1,
+              }}
               transition={isCore ? {
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut"
-              } : undefined}
+                opacity: { duration: 0.5 },
+                scale: {
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }
+              } : {
+                opacity: { duration: 0.4 },
+                scale: {
+                  type: "spring",
+                  stiffness: 260,
+                  damping: 20
+                }
+              }}
             >
               <Tooltip content={point.label}>
                 <div
@@ -368,19 +457,21 @@ function ConstellationMap({ isMinimized, setIsMinimized }: { isMinimized: boolea
                   onPointerMove={(e) => handlePointerMove(point.id, e)}
                   onPointerUp={(e) => handlePointerUp(point.id, e)}
                   className={cn(
-                    "rounded-2xl border backdrop-blur-md transition-transform flex items-center justify-center select-none",
+                    "rounded-2xl border backdrop-blur-md transition-all duration-300 flex items-center justify-center select-none",
                     isCore 
                       ? "p-5 rounded-full border-accent-purple bg-black/60 shadow-[0_0_30px_rgba(139,92,246,0.45)] cursor-pointer text-accent-purple hover:scale-105 active:scale-95" 
                       : "p-4 cursor-grab active:cursor-grabbing hover:scale-110",
-                    colors[point.color]
+                    colors[point.color],
+                    isHovered && "scale-105"
                   )}
                 >
                   <Icon size={isCore ? 28 : 20} className={isCore ? "animate-pulse" : ""} />
                 </div>
               </Tooltip>
               <span className={cn(
-                "text-[9px] font-mono whitespace-nowrap uppercase tracking-widest bg-black/60 px-2 py-0.5 rounded border border-white/5 shadow-md",
-                isCore ? "text-accent-purple border-accent-purple/20 font-bold" : "text-gray-400"
+                "text-[9px] font-mono whitespace-nowrap uppercase tracking-widest bg-black/60 px-2 py-0.5 rounded border border-white/5 shadow-md transition-all duration-300",
+                isCore ? "text-accent-purple border-accent-purple/20 font-bold" : "text-gray-400",
+                isHovered && "text-white border-white/10 scale-105"
               )}>
                 {point.label}
               </span>
@@ -437,6 +528,10 @@ export function SkillsSection() {
 
   return (
     <section id="habilidades" className="py-24 px-4 md:px-6 max-w-7xl mx-auto relative z-10">
+      {/* Decorative background glows */}
+      <div className="absolute top-1/4 left-1/4 -translate-x-1/2 w-96 h-96 rounded-full bg-accent-purple/10 blur-[130px] pointer-events-none -z-10" />
+      <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 w-96 h-96 rounded-full bg-accent-teal/10 blur-[130px] pointer-events-none -z-10" />
+
       <div className="flex flex-col items-center text-center mb-16">
         <div className="flex items-center gap-2 mb-4 px-4 py-1.5 rounded-full bg-accent-purple/10 border border-accent-purple/20 text-accent-purple text-[10px] font-mono uppercase tracking-[0.2em]">
           <Cpu size={14} />
