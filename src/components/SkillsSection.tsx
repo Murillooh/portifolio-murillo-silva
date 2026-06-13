@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Database, 
@@ -94,13 +94,15 @@ interface Node {
   id: number;
   x: number;
   y: number;
+  baseX: number;
+  baseY: number;
   icon: any;
   label: string;
   color: 'purple' | 'teal' | 'orange';
   isCenter?: boolean;
 }
 
-const INITIAL_NODES: Node[] = [
+const INITIAL_NODES_RAW = [
   { id: 0, x: 50, y: 50, icon: Brain, label: 'CÉREBRO COGNITIVO', color: 'purple', isCenter: true },
   { id: 1, x: 30, y: 32, icon: Layout, label: 'React 19', color: 'purple' },
   { id: 2, x: 70, y: 32, icon: Database, label: 'Node.js / Express', color: 'teal' },
@@ -114,7 +116,7 @@ const INITIAL_NODES: Node[] = [
   { id: 10, x: 62, y: 18, icon: Sparkles, label: 'Inteligência Artificial', color: 'purple' }
 ];
 
-const EXTRA_NODES: Node[] = [
+const EXTRA_NODES_RAW = [
   { id: 11, x: 24, y: 16, icon: Layout, label: 'Tailwind CSS', color: 'purple' },
   { id: 12, x: 14, y: 34, icon: Layout, label: 'Next.js Framework', color: 'purple' },
   { id: 13, x: 10, y: 60, icon: Sparkles, label: 'Framer Motion', color: 'purple' },
@@ -124,6 +126,18 @@ const EXTRA_NODES: Node[] = [
   { id: 17, x: 82, y: 16, icon: Cpu, label: 'Vercel Cloud', color: 'orange' },
   { id: 18, x: 90, y: 60, icon: Database, label: 'Docker Containers', color: 'teal' }
 ];
+
+const INITIAL_NODES_WITH_BASE: Node[] = INITIAL_NODES_RAW.map(n => ({
+  ...n,
+  baseX: n.x,
+  baseY: n.y
+})) as Node[];
+
+const EXTRA_NODES_WITH_BASE: Node[] = EXTRA_NODES_RAW.map(n => ({
+  ...n,
+  baseX: n.x,
+  baseY: n.y
+})) as Node[];
 
 const PRIMARY_LINKS = [
   { source: 0, target: 1 },
@@ -170,7 +184,7 @@ const EXTRA_LINKS = [
 ];
 
 function ConstellationMap({ isMinimized, setIsMinimized }: { isMinimized: boolean, setIsMinimized: (v: boolean) => void }) {
-  const [nodes, setNodes] = useState<Node[]>(INITIAL_NODES);
+  const [nodes, setNodes] = useState<Node[]>(INITIAL_NODES_WITH_BASE);
   const [isBrainExpanded, setIsBrainExpanded] = useState(false);
   const [activeDragId, setActiveDragId] = useState<number | null>(null);
   const [hoveredNodeId, setHoveredNodeId] = useState<number | null>(null);
@@ -179,13 +193,48 @@ function ConstellationMap({ isMinimized, setIsMinimized }: { isMinimized: boolea
   const containerRef = useRef<HTMLDivElement>(null);
   const dragStartRef = useRef<{ x: number, y: number } | null>(null);
 
+  // Synchronized gentle floating animation via requestAnimationFrame
+  useEffect(() => {
+    let animFrameId: number;
+    const startTime = performance.now();
+
+    const updateFloat = () => {
+      const elapsed = (performance.now() - startTime) * 0.001; // elapsed time in seconds
+      setNodes(currentNodes =>
+        currentNodes.map(n => {
+          // Skip floating for the node currently being dragged to avoid jitters
+          if (n.id === activeDragId) {
+            return n;
+          }
+          // Tiny subtle sinusoidal drifts
+          const amp = n.isCenter ? 0.35 : 0.9;
+          const freqX = 1 + (n.id % 3) * 0.25;
+          const freqY = 0.8 + (n.id % 2) * 0.35;
+          
+          const floatX = Math.sin(elapsed * freqX + n.id * 1.5) * amp;
+          const floatY = Math.cos(elapsed * freqY + n.id * 2.0) * amp;
+          
+          return {
+            ...n,
+            x: Math.max(2, Math.min(98, n.baseX + floatX)),
+            y: Math.max(2, Math.min(98, n.baseY + floatY))
+          };
+        })
+      );
+      animFrameId = requestAnimationFrame(updateFloat);
+    };
+
+    animFrameId = requestAnimationFrame(updateFloat);
+    return () => cancelAnimationFrame(animFrameId);
+  }, [activeDragId]);
+
   const toggleExpandBrain = () => {
     setIsBrainExpanded(prev => {
       const nextState = !prev;
       if (nextState) {
         setNodes(current => {
           const existingIds = new Set(current.map(n => n.id));
-          const toAdd = EXTRA_NODES.filter(n => !existingIds.has(n.id));
+          const toAdd = EXTRA_NODES_WITH_BASE.filter(n => !existingIds.has(n.id));
           return [...current, ...toAdd];
         });
       } else {
@@ -224,7 +273,13 @@ function ConstellationMap({ isMinimized, setIsMinimized }: { isMinimized: boolea
     setNodes(prev =>
       prev.map(n =>
         n.id === id
-          ? { ...n, x: Math.max(4, Math.min(96, newX)), y: Math.max(5, Math.min(95, newY)) }
+          ? { 
+              ...n, 
+              baseX: Math.max(4, Math.min(96, newX)), 
+              baseY: Math.max(5, Math.min(95, newY)),
+              x: Math.max(4, Math.min(96, newX)),
+              y: Math.max(5, Math.min(95, newY))
+            }
           : n
       )
     );
@@ -278,22 +333,7 @@ function ConstellationMap({ isMinimized, setIsMinimized }: { isMinimized: boolea
           stroke-dasharray: 4, 8;
           animation: synapse-glow 0.8s linear infinite;
         }
-        @keyframes float-even {
-          0% { translate: 0px 0px; }
-          50% { translate: 2px -4px; }
-          100% { translate: 0px 0px; }
-        }
-        @keyframes float-odd {
-          0% { translate: 0px 0px; }
-          50% { translate: -3px 3px; }
-          100% { translate: 0px 0px; }
-        }
-        .animate-float-even {
-          animation: float-even 6s ease-in-out infinite;
-        }
-        .animate-float-odd {
-          animation: float-odd 5s ease-in-out infinite;
-        }
+
         @keyframes spin-clockwise {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
@@ -423,10 +463,7 @@ function ConstellationMap({ isMinimized, setIsMinimized }: { isMinimized: boolea
               style={{ left: `${point.x}%`, top: `${point.y}%` }}
               onMouseEnter={() => setHoveredNodeId(point.id)}
               onMouseLeave={() => setHoveredNodeId(null)}
-              className={cn(
-                "absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-1.5 z-20 transition-transform duration-300",
-                activeDragId !== point.id && (point.id % 2 === 0 ? "animate-float-even" : "animate-float-odd")
-              )}
+              className="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-1.5 z-20"
               initial={isCore ? { opacity: 0 } : { opacity: 0, scale: 0 }}
               animate={isCore ? {
                 opacity: 1,
