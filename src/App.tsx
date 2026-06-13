@@ -435,11 +435,11 @@ export default function App() {
 
     const welcomeTimer = setTimeout(() => {
       say("Olá! Sou o assistente do Murillo. Sinta-se à vontade para explorar!");
-    }, 4500); // Increased delay to account for preloader
+    }, 7000); // Increased delay to account for longer preloader
 
     const loadingTimer = setTimeout(() => {
       setLoading(false);
-    }, 2500);
+    }, 5000);
 
     // Auto-refresh on 5 minutes of inactivity
     let inactivityTimeout: ReturnType<typeof setTimeout>;

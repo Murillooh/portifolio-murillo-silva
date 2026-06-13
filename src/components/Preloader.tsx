@@ -45,8 +45,8 @@ export function Preloader() {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    const duration = 2100; // 2.1s loader duration
-    const intervalTime = 21; // ~100 steps
+    const duration = 4500; // 4.5s loader duration
+    const intervalTime = 45; // ~100 steps
     const timer = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
