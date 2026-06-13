@@ -441,25 +441,10 @@ export default function App() {
       setLoading(false);
     }, 5000);
 
-    // Auto-refresh on 5 minutes of inactivity
-    let inactivityTimeout: ReturnType<typeof setTimeout>;
-    const resetInactivityTimer = () => {
-      if (inactivityTimeout) clearTimeout(inactivityTimeout);
-      inactivityTimeout = setTimeout(() => {
-        window.location.reload();
-      }, 300000); // 5 minutes
-    };
-
-    const activityEvents = ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart'];
-    activityEvents.forEach(event => window.addEventListener(event, resetInactivityTimer));
-    resetInactivityTimer();
-
     return () => {
       observer.disconnect();
       clearTimeout(welcomeTimer);
       clearTimeout(loadingTimer);
-      if (inactivityTimeout) clearTimeout(inactivityTimeout);
-      activityEvents.forEach(event => window.removeEventListener(event, resetInactivityTimer));
     };
   }, []);
 
