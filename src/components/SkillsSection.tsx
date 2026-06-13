@@ -183,9 +183,11 @@ const EXTRA_LINKS = [
   { source: 16, target: 17 }
 ];
 
+const ALL_NODES_WITH_BASE: Node[] = [...INITIAL_NODES_WITH_BASE, ...EXTRA_NODES_WITH_BASE];
+
 function ConstellationMap({ isMinimized, setIsMinimized }: { isMinimized: boolean, setIsMinimized: (v: boolean) => void }) {
-  const [nodes, setNodes] = useState<Node[]>(INITIAL_NODES_WITH_BASE);
-  const [isBrainExpanded, setIsBrainExpanded] = useState(false);
+  const [nodes, setNodes] = useState<Node[]>(ALL_NODES_WITH_BASE);
+  const [isBrainExpanded, setIsBrainExpanded] = useState(true);
   const [activeDragId, setActiveDragId] = useState<number | null>(null);
   const [hoveredNodeId, setHoveredNodeId] = useState<number | null>(null);
   const [ripples, setRipples] = useState<{ id: number }[]>([]);
