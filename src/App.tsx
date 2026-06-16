@@ -11,7 +11,6 @@ import {
   Layout,
   Cpu,
   Layers,
-  Github,
   Linkedin,
   X,
   Eye
@@ -800,11 +799,6 @@ export default function App() {
                     <div className="flex justify-between items-start mb-3">
                       <h3 className="text-xl font-display group-hover/card:text-accent-purple transition-colors text-white">{project.name}</h3>
                       <div className="flex gap-3" onClick={(e) => e.stopPropagation()}>
-                        {project.githubUrl && (
-                          <a href={project.githubUrl} target="_blank" rel="noreferrer" className="text-gray-400 hover:text-white transition-colors bg-white/5 p-1.5 rounded-md border border-white/10" title="Ver código no GitHub">
-                            <Github size={16} />
-                          </a>
-                        )}
                         <a href={`https://${project.url}`} target="_blank" rel="noreferrer" className="text-gray-400 hover:text-white transition-colors bg-white/5 p-1.5 rounded-md border border-white/10" title="Ver Site">
                           <ExternalLink size={16} />
                         </a>
@@ -870,20 +864,6 @@ export default function App() {
                 role="group"
                 aria-label="Links para redes sociais"
               >
-                <Tooltip text="GitHub">
-                  <motion.a
-                    variants={STAGGER_ITEM}
-                    href="https://github.com/Murillooh"
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label="Acessar GitHub de Murillo Silva (Abre em nova aba)"
-                    whileHover={{ y: -4, scale: 1.1 }}
-                    className="p-3 bg-card-bg border border-card-border rounded-xl text-gray-400 hover:text-white hover:border-accent-purple/50 transition-colors shadow-xl"
-                  >
-                    <Github size={20} />
-                  </motion.a>
-                </Tooltip>
-
                 <Tooltip text="LinkedIn">
                   <motion.a
                     variants={STAGGER_ITEM}
@@ -1075,16 +1055,7 @@ export default function App() {
                   >
                     Ver Site <ExternalLink size={18} className="group-hover/btn:translate-x-1 transition-transform" />
                   </a>
-                  {selectedProject.githubUrl && (
-                    <a
-                      href={selectedProject.githubUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="flex-1 bg-card-bg border border-white/20 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-3 hover:bg-white/10 transition-all active:scale-95 group/git"
-                    >
-                      GitHub <Github size={18} className="group-hover/git:rotate-12 transition-transform" />
-                    </a>
-                  )}
+
                 </motion.div>
               </div>
             </motion.div>

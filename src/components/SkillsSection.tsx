@@ -121,7 +121,7 @@ const EXTRA_NODES_RAW = [
   { id: 12, x: 14, y: 34, icon: Layout, label: 'Next.js Framework', color: 'purple' },
   { id: 13, x: 10, y: 60, icon: Sparkles, label: 'Framer Motion', color: 'purple' },
   { id: 14, x: 44, y: 92, icon: Target, label: 'Recharts API', color: 'purple' },
-  { id: 15, x: 74, y: 92, icon: Cpu, label: 'Git & GitHub', color: 'orange' },
+  { id: 15, x: 74, y: 92, icon: Cpu, label: 'Git & Versionamento', color: 'orange' },
   { id: 16, x: 88, y: 34, icon: Cpu, label: 'Vite Bundler', color: 'orange' },
   { id: 17, x: 82, y: 16, icon: Cpu, label: 'Vercel Cloud', color: 'orange' },
   { id: 18, x: 90, y: 60, icon: Database, label: 'Docker Containers', color: 'teal' }
